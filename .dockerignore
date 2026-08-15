@@ -1,0 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+.git
+.venv
+venv
+__pycache__
+*.pyc
+*.db
+.env
+.env.*
+*.env
+.DS_Store
+.azure
+*.log

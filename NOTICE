@@ -1,0 +1,14 @@
+RoboStew
+Copyright 2026 Anatoli Fomenko
+
+This product is licensed under the Apache License, Version 2.0.
+
+The local edition uses the Valkey container image. Valkey is licensed under
+the BSD 3-Clause License. Valkey is a trademark of LF Projects, LLC.
+
+The local control-plane image uses Node.js. Node.js is distributed under its
+own license and includes third-party software under additional licenses.
+
+Docker, macOS, Azure, Dell, LF Edge EVE, NemoClaw, OpenShell, and other names
+are trademarks of their respective owners. Their inclusion describes tested
+or optional integrations and does not imply endorsement.

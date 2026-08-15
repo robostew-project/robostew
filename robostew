@@ -1,0 +1,198 @@
+#!/bin/sh
+# SPDX-License-Identifier: Apache-2.0
+set -eu
+
+ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+COMPOSE_FILE="$ROOT_DIR/compose.yaml"
+PROJECT_NAME=robostew
+LOCAL_IMAGE=robostew/control-plane:0.1.0
+PORT=${ROBOSTEW_PORT:-8080}
+BASE_URL="http://127.0.0.1:$PORT"
+
+say() {
+  printf '%s\n' "$*"
+}
+
+fail() {
+  printf 'RoboStew: %s\n' "$*" >&2
+  exit 1
+}
+
+require_tools() {
+  command -v docker >/dev/null 2>&1 || fail "Docker is required."
+  command -v curl >/dev/null 2>&1 || fail "curl is required."
+  docker compose version >/dev/null 2>&1 || fail "Docker Compose is required."
+}
+
+require_daemon() {
+  docker info >/dev/null 2>&1 || fail "Docker Desktop is not running. Start it and retry."
+}
+
+platform_notice() {
+  os=$(uname -s)
+  arch=$(uname -m)
+  if [ "$os" = "Darwin" ] && [ "$arch" = "arm64" ]; then
+    say "Platform: Apple Silicon macOS (v0.1.0 validation target)"
+  else
+    say "WARNING: $os/$arch is untested for RoboStew v0.1.0; no compatibility claim is made."
+  fi
+}
+
+compose() {
+  docker compose --project-name "$PROJECT_NAME" --file "$COMPOSE_FILE" "$@"
+}
+
+wait_for_api() {
+  attempts=0
+  while [ "$attempts" -lt 60 ]; do
+    if curl --silent --fail "$BASE_URL/healthz" >/dev/null 2>&1; then
+      return 0
+    fi
+    attempts=$((attempts + 1))
+    sleep 1
+  done
+  return 1
+}
+
+start_stack() {
+  require_tools
+  require_daemon
+  platform_notice
+  say "Building RoboStew with Node.js 22 containers..."
+  compose build
+  say "Starting the local control plane..."
+  compose up --detach --wait --remove-orphans
+  wait_for_api || fail "The control plane did not become healthy. Run './robostew logs'."
+  say "RoboStew is running: $BASE_URL"
+  say "Run './robostew demo' to execute the deterministic fleet scenario."
+}
+
+status_stack() {
+  require_tools
+  require_daemon
+  if ! curl --silent --fail "$BASE_URL/api/runtime/truth"; then
+    fail "The local control plane is not reachable at $BASE_URL."
+  fi
+  printf '\n'
+}
+
+run_demo() {
+  require_tools
+  require_daemon
+  say "Running the deterministic fleet scenario..."
+  result_file=$(mktemp)
+  attempts=0
+  status=000
+  while [ "$attempts" -lt 20 ]; do
+    status=$(curl --silent --output "$result_file" --write-out '%{http_code}' --request POST "$BASE_URL/api/demo/run") || status=000
+    if [ "$status" = "200" ]; then
+      break
+    fi
+    if [ "$status" != "409" ]; then
+      rm -f "$result_file"
+      fail "The demonstration request failed with HTTP $status."
+    fi
+    attempts=$((attempts + 1))
+    sleep 1
+  done
+  if [ "$status" != "200" ]; then
+    rm -f "$result_file"
+    fail "The simulator remained busy for 20 seconds."
+  fi
+  result=$(cat "$result_file")
+  rm -f "$result_file"
+  say "$result"
+  summary=$(curl --silent --fail "$BASE_URL/api/summary") || fail "The demonstration summary is unavailable."
+  say "$summary"
+}
+
+stop_stack() {
+  require_tools
+  require_daemon
+  compose stop
+  say "RoboStew stopped. Persistent data was preserved."
+}
+
+uninstall_stack() {
+  require_tools
+  require_daemon
+  purge=${1:-false}
+  if [ "$purge" = "true" ]; then
+    say "Removing RoboStew containers, network, data volume, and local control-plane image..."
+    compose down --volumes --remove-orphans
+    if docker ps --all --quiet --filter "label=com.docker.compose.project=$PROJECT_NAME" | grep -q .; then
+      fail "RoboStew containers remain after purge."
+    fi
+    if docker volume inspect robostew-data >/dev/null 2>&1; then
+      fail "The robostew-data volume remains after purge."
+    fi
+    if docker network inspect robostew-local >/dev/null 2>&1; then
+      fail "The robostew-local network remains after purge."
+    fi
+    if docker image inspect "$LOCAL_IMAGE" >/dev/null 2>&1; then
+      docker image rm "$LOCAL_IMAGE" >/dev/null 2>&1 \
+        || fail "The RoboStew local image could not be removed. Stop any non-RoboStew container using $LOCAL_IMAGE and retry."
+    fi
+    if docker image inspect "$LOCAL_IMAGE" >/dev/null 2>&1; then
+      fail "The RoboStew local image remains after purge."
+    fi
+    say "RoboStew runtime state and local image were purged. The repository, shared images, and Docker installation were not removed."
+  else
+    say "Removing RoboStew containers and network while preserving robostew-data..."
+    compose down --remove-orphans
+    say "RoboStew was uninstalled. Persistent data remains in the robostew-data Docker volume."
+    say "Run './robostew uninstall --purge' to remove that volume."
+  fi
+}
+
+show_help() {
+  cat <<'EOF'
+RoboStew local control plane
+
+Usage:
+  ./robostew start
+  ./robostew status
+  ./robostew demo
+  ./robostew stop
+  ./robostew logs
+  ./robostew uninstall
+  ./robostew uninstall --purge
+EOF
+}
+
+command_name=${1:-help}
+case "$command_name" in
+  start)
+    start_stack
+    ;;
+  status)
+    status_stack
+    ;;
+  demo)
+    run_demo
+    ;;
+  stop)
+    stop_stack
+    ;;
+  logs)
+    require_tools
+    require_daemon
+    compose logs --follow
+    ;;
+  uninstall)
+    if [ "${2:-}" = "--purge" ]; then
+      uninstall_stack true
+    elif [ -n "${2:-}" ]; then
+      fail "Unknown uninstall option: $2"
+    else
+      uninstall_stack false
+    fi
+    ;;
+  help|-h|--help)
+    show_help
+    ;;
+  *)
+    show_help >&2
+    fail "Unknown command: $command_name"
+    ;;
+esac

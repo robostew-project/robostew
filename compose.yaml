@@ -1,0 +1,108 @@
+# SPDX-License-Identifier: Apache-2.0
+name: robostew
+
+services:
+  state-store:
+    image: valkey/valkey:8.1.9-alpine@sha256:a038175878d66b9d274fbf8be73c0305e93798b83917647f167e18cef3c71eec
+    command: ["valkey-server", "--appendonly", "yes", "--save", "60", "1"]
+    healthcheck:
+      test: ["CMD", "valkey-cli", "ping"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    labels:
+      com.robostew.owned: "true"
+    volumes:
+      - robostew-data:/data
+    restart: unless-stopped
+
+  control-plane:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    image: robostew/control-plane:0.1.0
+    command: ["node", "local/server.mjs"]
+    environment:
+      REDIS_HOST: state-store
+      REDIS_PORT: "6379"
+      SIMULATOR_URL: http://simulator:8090
+    depends_on:
+      state-store:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/healthz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    labels:
+      com.robostew.owned: "true"
+    ports:
+      - "127.0.0.1:${ROBOSTEW_PORT:-8080}:8080"
+    restart: unless-stopped
+
+  simulator:
+    image: robostew/control-plane:0.1.0
+    command: ["node", "local/simulator.mjs"]
+    environment:
+      CONTROL_PLANE_URL: http://control-plane:8080
+    depends_on:
+      control-plane:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8090/healthz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    labels:
+      com.robostew.owned: "true"
+    restart: unless-stopped
+
+  workload-inspection:
+    image: robostew/control-plane:0.1.0
+    command: ["node", "local/workload.mjs"]
+    environment:
+      CONTROL_PLANE_URL: http://control-plane:8080
+      WORKLOAD_ID: visual-inspection
+      WORKLOAD_ROLE: Camera inspection pipeline
+    depends_on:
+      control-plane:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8100/healthz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    labels:
+      com.robostew.owned: "true"
+    restart: unless-stopped
+
+  workload-routing:
+    image: robostew/control-plane:0.1.0
+    command: ["node", "local/workload.mjs"]
+    environment:
+      CONTROL_PLANE_URL: http://control-plane:8080
+      WORKLOAD_ID: fleet-routing
+      WORKLOAD_ROLE: Route coordination service
+    depends_on:
+      control-plane:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8100/healthz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    labels:
+      com.robostew.owned: "true"
+    restart: unless-stopped
+
+networks:
+  default:
+    name: robostew-local
+    labels:
+      com.robostew.owned: "true"
+
+volumes:
+  robostew-data:
+    name: robostew-data
+    labels:
+      com.robostew.owned: "true"

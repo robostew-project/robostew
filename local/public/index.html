@@ -1,0 +1,98 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="RoboStew local robot fleet control plane" />
+    <title>RoboStew — Local Fleet Control Plane</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+    <main class="shell">
+      <header class="topbar">
+        <a class="brand" href="/" aria-label="RoboStew home">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="brand-name">RoboStew</span>
+        </a>
+        <div class="topbar-copy">
+          <span class="edition">Local edition</span>
+          <span id="last-updated" class="last-updated">Connecting…</span>
+        </div>
+      </header>
+
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Robot fleet stewardship</p>
+          <h1>One clear view of<br /><span>every moving part.</span></h1>
+          <p class="lede">Bring any robot. Add your stack. Govern them as one fleet.</p>
+        </div>
+        <div class="hero-status">
+          <div id="overall-orb" class="status-orb"><span></span></div>
+          <div>
+            <p>Control plane</p>
+            <strong id="overall-state">Connecting</strong>
+            <small>Runtime-backed status</small>
+          </div>
+        </div>
+      </section>
+
+      <section id="summary" class="summary-grid" aria-label="Fleet summary">
+        <article class="metric"><span>Robots</span><strong id="robot-count">—</strong><small>simulated units</small></article>
+        <article class="metric"><span>Ready</span><strong id="ready-count">—</strong><small>current telemetry</small></article>
+        <article class="metric attention"><span>Attention</span><strong id="attention-count">—</strong><small>operator review</small></article>
+        <article class="metric"><span>Workloads</span><strong id="workload-count">—</strong><small>inert services</small></article>
+      </section>
+
+      <section class="workspace">
+        <div class="primary-column">
+          <article class="panel fleet-panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">Fleet</p><h2>Robot operations</h2></div>
+              <span id="scenario-stage" class="stage-pill">starting</span>
+            </div>
+            <div id="fleet-grid" class="fleet-grid"><p class="loading">Waiting for deterministic telemetry…</p></div>
+          </article>
+
+          <article class="panel timeline-panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">Evidence</p><h2>Scenario timeline</h2></div>
+              <span class="simulation-label">SIMULATED DATA</span>
+            </div>
+            <div id="event-list" class="event-list"><p class="loading">No events yet.</p></div>
+          </article>
+        </div>
+
+        <aside class="secondary-column">
+          <article class="panel truth-panel">
+            <div class="panel-heading"><div><p class="eyebrow">Runtime truth</p><h2>Component state</h2></div></div>
+            <div id="truth-list" class="truth-list"><p class="loading">Running functional probes…</p></div>
+          </article>
+
+          <article class="panel workload-panel">
+            <div class="panel-heading"><div><p class="eyebrow">Workloads</p><h2>Local services</h2></div></div>
+            <div id="workload-list" class="workload-list"><p class="loading">Waiting for heartbeats…</p></div>
+          </article>
+
+          <article class="boundary-card">
+            <div class="boundary-icon">AI</div>
+            <div>
+              <strong>Advisor intentionally off</strong>
+              <p>AI is optional and has no deployment or robot-control authority.</p>
+            </div>
+          </article>
+        </aside>
+      </section>
+
+      <footer>
+        <span>RoboStew v0.1.0 local validation build</span>
+        <span>No kinetic robot control · No cloud required</span>
+      </footer>
+    </main>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

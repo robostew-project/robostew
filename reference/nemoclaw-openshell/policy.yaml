@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Apache-2.0
+version: 1
+
+identity:
+  run_as_unprivileged_user: true
+
+filesystem:
+  host_mounts: denied
+  work_directory: read_only
+  temporary_directory: read_write
+
+network:
+  default: deny
+  allowed_routes:
+    - method: GET
+      host: inference.local
+      path: /v1/models
+    - method: POST
+      host: inference.local
+      path: /v1/chat/completions
+
+capabilities:
+  arbitrary_prompt: denied
+  caller_supplied_tools: denied
+  shell_execution: denied
+  workload_deployment: denied
+  host_mutation: denied
+  robot_actuation: denied
