@@ -6,7 +6,7 @@ Security fixes target the latest `v0.1.x` release only. The project is an early 
 
 ## Report a vulnerability privately
 
-After the repository is public, use GitHub private vulnerability reporting when its **Report a vulnerability** button is available. Otherwise, email `security@robostew.org`. Do not open a public issue containing exploit details, credentials, private endpoints, personal data, or unpublished infrastructure information.
+Use GitHub private vulnerability reporting through the repository's **Security** tab. If that channel is unavailable, email `security@robostew.org`. Do not open a public issue containing exploit details, credentials, private endpoints, personal data, or unpublished infrastructure information.
 
 Include:
 
@@ -17,7 +17,7 @@ Include:
 - realistic impact;
 - suggested mitigation, if known.
 
-The project email route must be operational before publication. GitHub private vulnerability reporting will be enabled and verified immediately after the repository becomes public because GitHub exposes that reporting feature for public repositories.
+GitHub private vulnerability reporting is enabled for the public repository.
 
 ## Security boundaries
 

@@ -1,6 +1,6 @@
 # RoboStew v0.1.0 Local Validation
 
-Status: **validated local release-candidate evidence; publication and tagging pending**
+Status: **validated `v0.1.0` release evidence; published on 2026-08-15**
 
 Validation date: 2026-08-14
 
@@ -26,7 +26,7 @@ This is one-host evidence. It must not be generalized into support for all Apple
 | Stop then cached restart | 9.00 seconds | Exact fresh clone; local image and persistent volume present |
 | Non-purge reinstall | 8.92 seconds | Exact fresh clone; containers and network recreated; volume and local image preserved |
 
-All three measurements were taken from a fresh local Git clone of the exact allowlisted candidate. A fully cold run with neither shared base image in the Docker cache was not recorded. Network cloning from the still-private dedicated GitHub repository was not timed. These results comfortably satisfy the five-to-ten-minute experience goal on this host, but they are observations rather than guarantees.
+All three measurements were taken from a fresh local Git clone of the exact allowlisted candidate. A fully cold run with neither shared base image in the Docker cache was not recorded. Network cloning from the pre-publication private GitHub repository was not timed. These results comfortably satisfy the five-to-ten-minute experience goal on this host, but they are observations rather than guarantees.
 
 ## Functional results
 
@@ -75,10 +75,13 @@ With RoboStew running:
 
 The validator checks unit behavior, Compose validity, service health, runtime truth, simulation labeling, public API privacy, browser security headers, invalid-input rejection, the fixed scenario, loopback binding, container privilege, and host mounts.
 
-## Remaining publication work
+## Post-publication verification
 
-- Create the public Git repository only after explicit approval.
-- Validate links after the final public GitHub URLs exist.
+- The public repository and `v0.1.0` release are available at the GitHub URLs documented in the README.
+- An anonymous fresh clone passed the publication audit and local Markdown-link check.
+- The initial GitHub Actions validation completed successfully.
+
+## Remaining validation work
+
 - Run a fully cold, empty-image-cache timing only if a cold-download claim is desired.
 - Record tests from additional browsers and platforms before adding compatibility claims.
-- Repeat the snapshot audit immediately before the eventual public commit and `v0.1.0` tag.
