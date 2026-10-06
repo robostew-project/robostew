@@ -90,7 +90,7 @@ Purge is irreversible for the local event timeline. It does not affect unrelated
 Confirm Docker can reach its configured registry and retry:
 
 ```bash
-docker pull valkey/valkey:8.1.9-alpine
+docker pull valkey/valkey:8.1.10-alpine
 docker pull node:22-alpine
 ./robostew start
 ```

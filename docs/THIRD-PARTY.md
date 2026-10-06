@@ -11,7 +11,7 @@ The control-plane image builds from the official Node.js 22 Alpine image. Node.j
 
 ## Valkey
 
-The local state store uses the official Valkey 8.1.9 Alpine image. Valkey is an open-source continuation of the Redis 7.2 codebase and is distributed under the BSD 3-Clause License.
+The local state store uses the official Valkey 8.1.10 Alpine image. Valkey is an open-source continuation of the Redis 7.2 codebase and is distributed under the BSD 3-Clause License.
 
 - Project: <https://valkey.io/>
 - Source and license: <https://github.com/valkey-io/valkey>
