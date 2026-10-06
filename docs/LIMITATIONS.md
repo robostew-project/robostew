@@ -1,4 +1,6 @@
-# RoboStew v0.1.0 Limitations
+# RoboStew Limitations
+
+The stable `v0.1.0` boundaries remain in force. Additional `v0.2.0` development boundaries are explicitly labeled below.
 
 These limitations are part of the release, not deferred marketing footnotes.
 
@@ -40,6 +42,14 @@ These limitations are part of the release, not deferred marketing footnotes.
 - The local edition does not install NemoClaw, OpenShell, a hosted provider, or a local model.
 - The reference AI path is advisory only and cannot deploy workloads, run host commands, mutate EVE, approve actions, or actuate robots.
 - Rapidly changing optional AI dependencies require separate version pinning and validation.
+
+## Kubernetes/GPU observer boundary (`v0.2.0` development)
+
+- The local GPU evidence is a sanitized fixture, not a live cluster measurement.
+- The observer is read-only and has no deployment, scaling, restart, remediation, or execution authority.
+- Listing pods exposes raw pod specifications to the local observer process before projection; use a dedicated, short-lived, least-privilege kubeconfig and a trusted workstation.
+- Only allowlisted output is sent to the loopback RoboStew API, but annotation values explicitly selected for lineage must still be treated as public.
+- No CoreWeave account, CoreWeave Kubernetes Service cluster, physical GPU node, or other managed GPU environment has been used for validation.
 
 ## Azure/Dell/EVE reference boundary
 

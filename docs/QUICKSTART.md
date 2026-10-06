@@ -1,6 +1,6 @@
 # RoboStew Local Quickstart
 
-This guide covers the only `v0.1.0` quickstart environment validated by the project: one Apple Silicon Mac with Docker Desktop.
+This guide covers the stable `v0.1.0` quickstart and the in-development `v0.2.0` local demonstration. Both have been validated on one Apple Silicon Mac with Docker Desktop; neither result establishes support for all Macs.
 
 ## Prerequisites
 
@@ -56,7 +56,7 @@ Expected output includes:
 {"status":"completed","scenario":"fleet-recovery","stages":4}
 ```
 
-The exact duration field varies. The dashboard timeline should show `baseline`, `attention`, `recovery`, and `stable`, with all five simulated robots ready at completion.
+The exact duration field varies. The dashboard timeline should show `baseline`, `attention`, `recovery`, and `stable`, with all five simulated robots ready at completion. The `v0.2.0` development branch also loads a clearly labeled Kubernetes/GPU fixture with two running accelerated workloads requesting three GPUs.
 
 ## Inspect runtime truth
 
@@ -70,6 +70,7 @@ Expected core states:
 - state store: `running`;
 - fleet simulator: `running`;
 - inert workloads: `running`;
+- Kubernetes/GPU observer: `running` after the fixture is loaded, then `unreachable` if it is not refreshed within 120 seconds;
 - AI advisor: `stopped`, because it is optional and not configured.
 
 An intentionally stopped optional advisor does not degrade the local core.
@@ -102,7 +103,7 @@ This removes:
 - RoboStew containers;
 - the `robostew-local` network;
 - the `robostew-data` volume.
-- the exact locally built `robostew/control-plane:0.1.0` image.
+- the exact locally built image for the checked-out version (`robostew/control-plane:0.2.0-dev` on the development branch).
 
 It does not remove the repository, Docker Desktop, shared Node.js or Valkey base images, unrelated containers, unrelated volumes, or other projects. If a non-RoboStew container is using the local RoboStew image, purge stops with a clear error rather than forcing its removal.
 

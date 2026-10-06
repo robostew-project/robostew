@@ -5,7 +5,7 @@ RoboStew welcomes focused contributions that improve truthful fleet visibility, 
 ## Before opening a change
 
 - Search existing issues and discussions.
-- Keep kinetic robot control outside `v0.1.x`.
+- Keep kinetic robot control outside the current release scope.
 - Do not weaken the advisory-only AI boundary.
 - Do not add static healthy or ready states where a functional probe can exist.
 - Do not commit credentials, private infrastructure identifiers, generated dependencies, databases, or raw operational evidence.

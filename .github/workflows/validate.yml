@@ -35,7 +35,7 @@ jobs:
       - name: Markdown links
         run: node scripts/check_markdown_links.mjs .
       - name: Build local image
-        run: docker build --file Dockerfile.local --tag robostew-ci:0.1.0 .
+        run: docker build --file Dockerfile.local --tag robostew-ci:0.2.0-dev .
       - name: Scan source, configuration, and secrets
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
@@ -51,7 +51,7 @@ jobs:
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: image
-          image-ref: robostew-ci:0.1.0
+          image-ref: robostew-ci:0.2.0-dev
           scanners: vuln,secret,misconfig
           severity: HIGH,CRITICAL
           format: table
@@ -61,7 +61,7 @@ jobs:
         uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         with:
           scan-type: image
-          image-ref: valkey/valkey:8.1.9-alpine@sha256:a038175878d66b9d274fbf8be73c0305e93798b83917647f167e18cef3c71eec
+          image-ref: valkey/valkey:8.1.10-alpine@sha256:081c2f5cb575efc901aa80ff9cdbd1ec6a301682fd35e1ebb4b0990a4a4a8507
           scanners: vuln,secret,misconfig
           severity: HIGH,CRITICAL
           format: table

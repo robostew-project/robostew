@@ -2,6 +2,22 @@
 
 All notable public changes will be recorded here.
 
+## Unreleased — 0.2.0
+
+### Added
+
+- Read-only, provider-neutral Kubernetes/GPU workload observer.
+- Sanitized fleet, robot-class, and physical-AI-loop lineage annotations.
+- Accelerated-workload API and dashboard evidence panel.
+- Least-privilege Kubernetes RBAC example with no write verbs.
+- Deterministic eight-GPU fixture and privacy-focused projection tests.
+
+### Changed
+
+- Local demonstration now exercises both robot-fleet recovery and accelerated-workload observation.
+- Runtime truth marks Kubernetes observations unreachable when they become stale.
+- Immutable Node.js and Valkey image pins were refreshed after CI identified a fixed high-severity OpenSSL vulnerability in the earlier Node image.
+
 ## 0.1.0 — 2026-08-15
 
 Initial open-source release:

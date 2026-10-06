@@ -3,7 +3,7 @@ name: robostew
 
 services:
   state-store:
-    image: valkey/valkey:8.1.9-alpine@sha256:a038175878d66b9d274fbf8be73c0305e93798b83917647f167e18cef3c71eec
+    image: valkey/valkey:8.1.10-alpine@sha256:081c2f5cb575efc901aa80ff9cdbd1ec6a301682fd35e1ebb4b0990a4a4a8507
     command: ["valkey-server", "--appendonly", "yes", "--save", "60", "1"]
     healthcheck:
       test: ["CMD", "valkey-cli", "ping"]
@@ -20,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.local
-    image: robostew/control-plane:0.1.0
+    image: robostew/control-plane:0.2.0-dev
     command: ["node", "local/server.mjs"]
     environment:
       REDIS_HOST: state-store
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 
   simulator:
-    image: robostew/control-plane:0.1.0
+    image: robostew/control-plane:0.2.0-dev
     command: ["node", "local/simulator.mjs"]
     environment:
       CONTROL_PLANE_URL: http://control-plane:8080
@@ -58,7 +58,7 @@ services:
     restart: unless-stopped
 
   workload-inspection:
-    image: robostew/control-plane:0.1.0
+    image: robostew/control-plane:0.2.0-dev
     command: ["node", "local/workload.mjs"]
     environment:
       CONTROL_PLANE_URL: http://control-plane:8080
@@ -77,7 +77,7 @@ services:
     restart: unless-stopped
 
   workload-routing:
-    image: robostew/control-plane:0.1.0
+    image: robostew/control-plane:0.2.0-dev
     command: ["node", "local/workload.mjs"]
     environment:
       CONTROL_PLANE_URL: http://control-plane:8080

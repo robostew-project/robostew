@@ -78,7 +78,7 @@ if [ ! -x "$TARGET/robostew" ] || [ ! -x "$TARGET/scripts/validate_local_release
   fail "launch or validation script is not executable"
 fi
 
-licensed_files=$(find "$TARGET/local" "$TARGET/reference" "$TARGET/scripts" -type f \( -name '*.mjs' -o -name '*.js' -o -name '*.sh' -o -name '*.css' -o -name '*.html' -o -name '*.yaml' -o -name '*.yml' \) -print)
+licensed_files=$(find "$TARGET/local" "$TARGET/reference" "$TARGET/scripts" "$TARGET/deploy" -type f \( -name '*.mjs' -o -name '*.js' -o -name '*.sh' -o -name '*.css' -o -name '*.html' -o -name '*.yaml' -o -name '*.yml' \) -print)
 for licensed_file in "$TARGET/Dockerfile.local" "$TARGET/compose.yaml" "$TARGET/robostew" "$TARGET/.dockerignore" "$TARGET/.gitignore" "$TARGET/.github/workflows/validate.yml" $licensed_files; do
   grep -Fq 'SPDX-License-Identifier: Apache-2.0' "$licensed_file" || fail "missing Apache-2.0 SPDX identifier: $licensed_file"
 done

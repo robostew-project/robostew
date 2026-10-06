@@ -48,7 +48,7 @@ pass "runtime truth and simulation labels"
 
 public_payload=$(mktemp)
 trap 'rm -f "$public_payload"' EXIT
-for endpoint in /api/runtime/truth /api/fleet /api/workloads /api/events /api/summary; do
+for endpoint in /api/runtime/truth /api/fleet /api/workloads /api/accelerated /api/events /api/summary; do
   curl --silent --fail "$BASE_URL$endpoint" >> "$public_payload"
   printf '\n' >> "$public_payload"
 done
@@ -71,15 +71,27 @@ invalid_status=$(curl --silent --output /dev/null --write-out '%{http_code}' --r
 [ "$invalid_status" = "400" ] || fail "invalid telemetry rejection"
 pass "invalid telemetry rejection"
 
+invalid_accelerated=$(curl --silent --output /dev/null --write-out '%{http_code}' --request POST --header 'Content-Type: application/json' --data '{"state":"running"}' "$BASE_URL/api/accelerated/snapshot")
+[ "$invalid_accelerated" = "400" ] || fail "invalid accelerated snapshot rejection"
+stale_payload='{"state":"running","observedAt":"2000-01-01T00:00:00.000Z","recordEvent":false,"summary":{"gpuNodes":1},"workloads":[{"id":"safe-workload","state":"running","pipelineStage":"evaluate","requestedGpus":1,"node":"private-node-name","credential":"must-not-cross-api"}]}'
+curl --silent --fail --request POST --header 'Content-Type: application/json' --data "$stale_payload" "$BASE_URL/api/accelerated/snapshot" >/dev/null
+json_has /api/accelerated '"state":"unreachable"'
+accelerated_payload=$(curl --silent --fail "$BASE_URL/api/accelerated")
+printf '%s' "$accelerated_payload" | grep -q 'private-node-name\|must-not-cross-api' && fail "accelerated snapshot privacy projection"
+pass "accelerated snapshot rejection, privacy projection, and stale-state behavior"
+
 demo_result=$(./robostew demo)
 printf '%s' "$demo_result" | grep -q '"status":"completed"' || fail "deterministic demonstration completion"
+printf '%s' "$demo_result" | grep -q '"requestedGpus":3' || fail "accelerated fixture ingestion"
 events=$(curl --silent --fail "$BASE_URL/api/events")
 for stage in baseline attention recovery stable; do
   printf '%s' "$events" | grep -q "\"stage\":\"$stage\"" || fail "missing demonstration stage $stage"
 done
 json_has /api/summary '"robots":5'
 json_has /api/summary '"runningWorkloads":2'
-pass "deterministic four-stage scenario and stable result"
+json_has /api/accelerated '"source":"fixture"'
+json_has /api/accelerated '"requestedGpus":3'
+pass "deterministic four-stage scenario, accelerated fixture, and stable result"
 
 binding=$(docker inspect robostew-control-plane-1 --format '{{(index (index .HostConfig.PortBindings "8080/tcp") 0).HostIp}}')
 [ "$binding" = "127.0.0.1" ] || fail "dashboard is not bound to loopback"

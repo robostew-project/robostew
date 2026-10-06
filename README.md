@@ -4,7 +4,7 @@
 
 > Bring any robot. Add your stack. Govern them as one fleet.
 
-RoboStew `v0.1.0` is a local-first engineering release that turns deterministic simulated robot telemetry, workload heartbeats, and functional probes into one honest fleet view. It runs without a cloud account and keeps AI optional.
+RoboStew `v0.1.0` is the stable local-first engineering release. Active `v0.2.0` development is connecting runtime-backed robot-fleet truth to read-only Kubernetes/GPU workload observation and physical-AI-loop lineage. It runs without a cloud account and keeps AI optional.
 
 Created and maintained by **Anatoli Fomenko** — [GitHub](https://github.com/afomenko) · [LinkedIn](https://www.linkedin.com/in/anatolifomenko)
 
@@ -36,6 +36,8 @@ The local stack contains five services:
 - inert fleet-routing workload.
 
 No host-installed database, Node.js, Python, cloud CLI, AI key, second machine, or Ubuntu virtual machine is required.
+
+The `v0.2.0` demonstration also loads a clearly labeled Kubernetes/GPU fixture through the same server-side projection used by the optional live observer. See the [active roadmap](docs/V0.2.0-ROADMAP.md) and [Kubernetes/GPU observer](docs/KUBERNETES-OBSERVER.md).
 
 ## What the demonstration proves
 
@@ -82,6 +84,9 @@ The containerized architecture may work elsewhere, but this release makes no sup
 - [Known limitations](docs/LIMITATIONS.md)
 - [Local validation evidence](docs/LOCAL-VALIDATION.md)
 - [Azure/Dell/EVE reference deployment](docs/REFERENCE-DEPLOYMENT.md)
+- [Kubernetes/GPU observer](docs/KUBERNETES-OBSERVER.md)
+- [v0.2.0 roadmap](docs/V0.2.0-ROADMAP.md)
+- [v0.2.0 development validation](docs/V0.2.0-VALIDATION.md)
 
 ## Reference deployment
 
