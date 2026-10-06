@@ -46,6 +46,7 @@
         <article class="metric"><span>Ready</span><strong id="ready-count">—</strong><small>current telemetry</small></article>
         <article class="metric attention"><span>Attention</span><strong id="attention-count">—</strong><small>operator review</small></article>
         <article class="metric"><span>Workloads</span><strong id="workload-count">—</strong><small>inert services</small></article>
+        <article class="metric accelerated"><span>Accelerated</span><strong id="accelerated-count">—</strong><small id="gpu-count">GPU workloads</small></article>
       </section>
 
       <section class="workspace">
@@ -78,6 +79,14 @@
             <div id="workload-list" class="workload-list"><p class="loading">Waiting for heartbeats…</p></div>
           </article>
 
+          <article class="panel accelerated-panel">
+            <div class="panel-heading">
+              <div><p class="eyebrow">Physical AI loop</p><h2>Accelerated workloads</h2></div>
+              <span id="accelerated-source" class="simulation-label">NOT OBSERVED</span>
+            </div>
+            <div id="accelerated-list" class="workload-list"><p class="loading">Load the safe fixture or connect the read-only Kubernetes observer.</p></div>
+          </article>
+
           <article class="boundary-card">
             <div class="boundary-icon">AI</div>
             <div>
@@ -89,7 +98,7 @@
       </section>
 
       <footer>
-        <span>RoboStew v0.1.0 local validation build</span>
+        <span>RoboStew v0.2.0 development build</span>
         <span>No kinetic robot control · No cloud required</span>
       </footer>
     </main>

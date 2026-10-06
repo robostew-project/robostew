@@ -6,6 +6,7 @@ import { extname, join, normalize } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { projectRobot, projectWorkload, publicEvent, summarizeFleet } from "./model.mjs";
+import { projectStoredAcceleratedSnapshot } from "./kubernetes.mjs";
 import { store } from "./store.mjs";
 
 const port = Number(process.env.PORT || 8080);
@@ -62,6 +63,11 @@ async function runtimeTruth() {
   const fleet = await store.fleet().catch(() => ({ robots: [], updatedAt: null }));
   const workloads = await store.workloads().catch(() => []);
   const freshWorkloads = workloads.filter((item) => ageSeconds(item.lastSeen) < 15);
+  const accelerated = projectStoredAcceleratedSnapshot(await store.accelerated().catch(() => ({})));
+  const acceleratedFresh = accelerated.observedAt && ageSeconds(accelerated.observedAt) < 120;
+  const acceleratedState = accelerated.observedAt
+    ? acceleratedFresh ? accelerated.state : "unreachable"
+    : "stopped";
   const fleetState = fleet.robots.length > 0 && ageSeconds(fleet.updatedAt) < 20 ? "running" : "degraded";
   const workloadState = freshWorkloads.length >= 2 ? "running" : "degraded";
   const overall = [stateStore, fleetState, workloadState].every((value) => value === "running") ? "running" : "degraded";
@@ -75,6 +81,14 @@ async function runtimeTruth() {
       { id: "state-store", label: "State store", state: stateStore, evidence: stateStore === "running" ? "Valkey PING succeeded" : "Valkey PING failed" },
       { id: "fleet-simulator", label: "Fleet simulator", state: fleetState, evidence: `${fleet.robots.length} simulated robots; telemetry age ${Math.round(ageSeconds(fleet.updatedAt))}s` },
       { id: "inert-workloads", label: "Inert workloads", state: workloadState, evidence: `${freshWorkloads.length}/${workloads.length || 2} current heartbeats` },
+      {
+        id: "accelerated-workloads",
+        label: "Kubernetes / GPU observer",
+        state: acceleratedState,
+        evidence: accelerated.observedAt
+          ? `${accelerated.summary.runningWorkloads}/${accelerated.summary.workloads} workloads; ${accelerated.summary.requestedGpus} GPU requested${accelerated.simulated ? "; fixture data" : ""}`
+          : "Optional read-only observer is not configured",
+      },
       { id: "ai-advisor", label: "AI advisor", state: "stopped", evidence: "Optional and not configured in the local edition" },
     ],
   };
@@ -113,6 +127,12 @@ async function api(request, response, pathname) {
     return json(response, 200, { workloads });
   }
 
+  if (request.method === "GET" && pathname === "/api/accelerated") {
+    const snapshot = projectStoredAcceleratedSnapshot(await store.accelerated());
+    if (snapshot.observedAt && ageSeconds(snapshot.observedAt) >= 120) snapshot.state = "unreachable";
+    return json(response, 200, snapshot);
+  }
+
   if (request.method === "GET" && pathname === "/api/events") {
     return json(response, 200, { events: (await store.events()).map(publicEvent).slice(-20).reverse() });
   }
@@ -120,7 +140,12 @@ async function api(request, response, pathname) {
   if (request.method === "GET" && pathname === "/api/summary") {
     const fleet = await store.fleet();
     const workloads = await store.workloads();
-    return json(response, 200, summarizeFleet(fleet.robots.map(projectRobot), workloads.map(projectWorkload)));
+    const accelerated = projectStoredAcceleratedSnapshot(await store.accelerated());
+    return json(response, 200, {
+      ...summarizeFleet(fleet.robots.map(projectRobot), workloads.map(projectWorkload)),
+      acceleratedWorkloads: accelerated.summary.workloads,
+      requestedGpus: accelerated.summary.requestedGpus,
+    });
   }
 
   if (request.method === "POST" && pathname === "/api/telemetry/batch") {
@@ -147,6 +172,30 @@ async function api(request, response, pathname) {
     next.push(workload);
     await store.saveWorkloads(next);
     return json(response, 202, { accepted: true, workload: workload.id });
+  }
+
+  if (request.method === "POST" && pathname === "/api/accelerated/snapshot") {
+    const input = await bodyJson(request);
+    const snapshot = projectStoredAcceleratedSnapshot(input);
+    if (!snapshot.observedAt || Number.isNaN(Date.parse(snapshot.observedAt))) {
+      return json(response, 400, { error: "invalid_accelerated_snapshot" });
+    }
+    await store.saveAccelerated(snapshot);
+    if (input.recordEvent !== false) {
+      const nodeLabel = snapshot.summary.gpuNodes === 1 ? "GPU node" : "GPU nodes";
+      await appendEvent({
+        at: new Date().toISOString(),
+        stage: "accelerated",
+        message: `${snapshot.summary.workloads} accelerated workloads observed across ${snapshot.summary.gpuNodes} ${nodeLabel}.`,
+        tone: snapshot.state === "running" ? "good" : "warning",
+      });
+    }
+    return json(response, 202, {
+      accepted: true,
+      workloads: snapshot.summary.workloads,
+      requestedGpus: snapshot.summary.requestedGpus,
+      simulated: snapshot.simulated,
+    });
   }
 
   if (request.method === "POST" && pathname === "/api/demo/run") {

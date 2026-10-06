@@ -1,6 +1,8 @@
 # RoboStew v0.1.0 Platform Matrix
 
-Status: **single-host release-candidate evidence**
+Status: **single-host stable-release evidence plus separately recorded `v0.2.0` development validation**
+
+The `v0.1.0` table below remains the stable release record. The first `v0.2.0` development slice was separately revalidated on macOS 27.0.1 on 2026-10-05; see `V0.2.0-VALIDATION.md`. No additional platform-support claim has been added yet.
 
 RoboStew `v0.1.0` was tested on one Apple Silicon Mac. Passing on that host does not establish general macOS compatibility. The current private Azure/Dell validation is evidence for the reference architecture, not proof that the laptop edition works on Ubuntu.
 

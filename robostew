@@ -5,7 +5,7 @@ set -eu
 ROOT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 COMPOSE_FILE="$ROOT_DIR/compose.yaml"
 PROJECT_NAME=robostew
-LOCAL_IMAGE=robostew/control-plane:0.1.0
+LOCAL_IMAGE=robostew/control-plane:0.2.0-dev
 PORT=${ROBOSTEW_PORT:-8080}
 BASE_URL="http://127.0.0.1:$PORT"
 
@@ -32,9 +32,9 @@ platform_notice() {
   os=$(uname -s)
   arch=$(uname -m)
   if [ "$os" = "Darwin" ] && [ "$arch" = "arm64" ]; then
-    say "Platform: Apple Silicon macOS (v0.1.0 validation target)"
+    say "Platform: Apple Silicon macOS (v0.2.0 development validation target)"
   else
-    say "WARNING: $os/$arch is untested for RoboStew v0.1.0; no compatibility claim is made."
+    say "WARNING: $os/$arch is untested for RoboStew v0.2.0; no compatibility claim is made."
   fi
 }
 
@@ -104,6 +104,17 @@ run_demo() {
   say "$result"
   summary=$(curl --silent --fail "$BASE_URL/api/summary") || fail "The demonstration summary is unavailable."
   say "$summary"
+  say "Loading the sanitized Kubernetes/GPU fixture..."
+  compose exec --no-TTY control-plane node local/kubernetes-observer.mjs --fixture /app/local/fixtures
+}
+
+observe_kubernetes() {
+  require_tools
+  require_daemon
+  command -v node >/dev/null 2>&1 || fail "Node.js 22 or later is required for the optional Kubernetes observer."
+  command -v kubectl >/dev/null 2>&1 || fail "kubectl is required for the optional Kubernetes observer."
+  curl --silent --fail "$BASE_URL/healthz" >/dev/null || fail "Start RoboStew before observing Kubernetes."
+  node "$ROOT_DIR/local/kubernetes-observer.mjs"
 }
 
 stop_stack() {
@@ -153,6 +164,7 @@ Usage:
   ./robostew start
   ./robostew status
   ./robostew demo
+  ./robostew observe-kubernetes
   ./robostew stop
   ./robostew logs
   ./robostew uninstall
@@ -170,6 +182,9 @@ case "$command_name" in
     ;;
   demo)
     run_demo
+    ;;
+  observe-kubernetes)
+    observe_kubernetes
     ;;
   stop)
     stop_stack

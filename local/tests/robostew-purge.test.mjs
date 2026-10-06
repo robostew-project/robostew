@@ -59,7 +59,7 @@ test("purge removes only the exact RoboStew local image", async (context) => {
   const log = await readFile(mock.log, "utf8");
   assert.match(result.stdout, /local image were purged/);
   assert.match(log, /compose --project-name robostew --file .*compose\.yaml down --volumes --remove-orphans/);
-  assert.match(log, /image rm robostew\/control-plane:0\.1\.0/);
+  assert.match(log, /image rm robostew\/control-plane:0\.2\.0-dev/);
   assert.doesNotMatch(log, /valkey\/|node:22|alpine@sha256/);
 });
 
@@ -67,6 +67,6 @@ test("purge fails clearly when another container holds the local image", async (
   const mock = await mockEnvironment(context, true);
   await assert.rejects(
     execFileAsync(path.join(root, "robostew"), ["uninstall", "--purge"], { cwd: root, env: mock.env }),
-    (error) => error.code === 1 && /non-RoboStew container using robostew\/control-plane:0\.1\.0/.test(error.stderr),
+    (error) => error.code === 1 && /non-RoboStew container using robostew\/control-plane:0\.2\.0-dev/.test(error.stderr),
   );
 });

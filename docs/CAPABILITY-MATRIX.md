@@ -1,6 +1,6 @@
-# RoboStew v0.1.0 Capability Matrix
+# RoboStew Capability Matrix
 
-Status: **release-candidate claims contract**
+Status: **`v0.1.0` stable claims plus explicitly marked `v0.2.0` development work**
 
 Legend:
 
@@ -18,6 +18,8 @@ Legend:
 | Alerts and degraded states | Required | Reference | Advisory interpretation only | No automatic remediation |
 | Fleet inventory | Required, simulated | Reference EVE/device inventory | Read-only | Not a production asset registry |
 | Inert workload lifecycle | Required demonstration | Reference and privately validated | No deployment authority | Software workloads only |
+| Kubernetes/GPU observation | `v0.2.0` development fixture and optional live adapter | Not part of the Azure/Dell/EVE evidence | Read-only | Standard API compatibility; no provider validation claim |
+| Fleet-to-accelerated-workload lineage | `v0.2.0` development | Not claimed | Read-only metadata | Public aliases and physical-AI-loop stages only |
 | Valkey-backed local state | Required, containerized | Reference deployment uses Redis with bounded retention | No direct access required | Not a high-availability data service |
 | Persistent restart recovery | Required locally | Azure guest reboot privately validated | Optional component failures isolated | Full disaster recovery not claimed |
 | Azure infrastructure template | Not required | Documentation only; no template ships | Managed identity reference source only | No environment-recreation claim |
@@ -38,7 +40,7 @@ Legend:
 
 The private environment currently demonstrates a working Azure controller, Dell/EVE visibility, five inert workloads, bounded state retention, Azure guest cold boot, a fresh managed-identity advisor call, and dated NemoClaw/OpenShell functional and negative-policy evidence. The optional NemoClaw path has no availability guarantee and is not part of the local edition.
 
-Those results support the reference story but do not automatically validate the public snapshot. Public evidence must be regenerated or rewritten against the exact history-free release candidate.
+Those results support the reference story but do not automatically validate the public source. Public evidence must be regenerated against the exact release candidate.
 
 ## Status language
 

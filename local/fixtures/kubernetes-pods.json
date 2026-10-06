@@ -1,0 +1,47 @@
+{
+  "apiVersion": "v1",
+  "kind": "PodList",
+  "items": [
+    {
+      "metadata": {
+        "name": "private-render-job-name",
+        "namespace": "private-team-namespace",
+        "annotations": {
+          "robostew.org/workload-id": "synthetic-data-batch",
+          "robostew.org/role": "Synthetic sensor-data generation",
+          "robostew.org/pipeline-stage": "curate",
+          "robostew.org/fleet": "warehouse-fleet",
+          "robostew.org/robot-class": "mobile-manipulator"
+        }
+      },
+      "spec": {
+        "nodeName": "fixture-gpu-node",
+        "containers": [{ "resources": { "requests": { "nvidia.com/gpu": "2" } } }]
+      },
+      "status": { "phase": "Running", "containerStatuses": [{ "ready": true }] }
+    },
+    {
+      "metadata": {
+        "name": "private-evaluation-job-name",
+        "namespace": "private-team-namespace",
+        "annotations": {
+          "robostew.org/workload-id": "policy-evaluation",
+          "robostew.org/role": "Robot-policy evaluation",
+          "robostew.org/pipeline-stage": "evaluate",
+          "robostew.org/fleet": "warehouse-fleet",
+          "robostew.org/robot-class": "mobile-manipulator"
+        }
+      },
+      "spec": {
+        "nodeName": "fixture-gpu-node",
+        "containers": [{ "resources": { "limits": { "nvidia.com/gpu": "1" } } }]
+      },
+      "status": { "phase": "Running", "containerStatuses": [{ "ready": true }] }
+    },
+    {
+      "metadata": { "name": "ordinary-cpu-service", "namespace": "system" },
+      "spec": { "nodeName": "fixture-cpu-node", "containers": [{ "resources": {} }] },
+      "status": { "phase": "Running", "containerStatuses": [{ "ready": true }] }
+    }
+  ]
+}

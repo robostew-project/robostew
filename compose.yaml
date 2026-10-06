@@ -20,7 +20,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.local
-    image: robostew/control-plane:0.1.0
+    image: robostew/control-plane:0.2.0-dev
     command: ["node", "local/server.mjs"]
     environment:
       REDIS_HOST: state-store
@@ -41,7 +41,7 @@ services:
     restart: unless-stopped
 
   simulator:
-    image: robostew/control-plane:0.1.0
+    image: robostew/control-plane:0.2.0-dev
     command: ["node", "local/simulator.mjs"]
     environment:
       CONTROL_PLANE_URL: http://control-plane:8080
@@ -58,7 +58,7 @@ services:
     restart: unless-stopped
 
   workload-inspection:
-    image: robostew/control-plane:0.1.0
+    image: robostew/control-plane:0.2.0-dev
     command: ["node", "local/workload.mjs"]
     environment:
       CONTROL_PLANE_URL: http://control-plane:8080
@@ -77,7 +77,7 @@ services:
     restart: unless-stopped
 
   workload-routing:
-    image: robostew/control-plane:0.1.0
+    image: robostew/control-plane:0.2.0-dev
     command: ["node", "local/workload.mjs"]
     environment:
       CONTROL_PLANE_URL: http://control-plane:8080

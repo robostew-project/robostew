@@ -11,6 +11,7 @@ flowchart LR
     Simulator["Deterministic fleet simulator"] -->|"allowlisted telemetry batches"| Control
     Inspection["Inert inspection workload"] -->|"heartbeat"| Control
     Routing["Inert routing workload"] -->|"heartbeat"| Control
+    Observer["Read-only Kubernetes / GPU observer"] -->|"sanitized snapshot"| Control
     Control --> Truth["Runtime truth projection"]
     Truth --> Operator
 ```
@@ -46,6 +47,16 @@ All five services share the private `robostew-local` Docker network. Only the da
 - Demonstrate two workload identities and current heartbeat reporting.
 - Run as unprivileged Node.js containers.
 - Have no host mounts and no robot-control behavior.
+
+### Kubernetes/GPU observer (`v0.2.0` development)
+
+- Lists nodes and pods through the operator's `kubectl` context.
+- Discovers GPU requests and allowlisted fleet/workload lineage annotations.
+- Discards raw Kubernetes identities, commands, images, endpoints, and credentials before transmission.
+- Uses no Kubernetes write verb and has no deployment or remediation path.
+- Becomes unreachable after its observation window expires.
+
+The local demonstration runs the same projection against a clearly marked fixture. Live observation is optional and requires separate, deliberately restricted Kubernetes credentials. See [Kubernetes/GPU Observer](KUBERNETES-OBSERVER.md).
 
 ## Runtime truth
 

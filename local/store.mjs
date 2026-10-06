@@ -27,6 +27,15 @@ export const store = {
   saveFleet: (value) => writeJson("robostew:fleet", value),
   workloads: () => readJson("robostew:workloads", []),
   saveWorkloads: (value) => writeJson("robostew:workloads", value),
+  accelerated: () => readJson("robostew:accelerated", {
+    state: "stopped",
+    observedAt: null,
+    source: "kubernetes",
+    simulated: false,
+    summary: {},
+    workloads: [],
+  }),
+  saveAccelerated: (value) => writeJson("robostew:accelerated", value),
   events: () => readJson("robostew:events", []),
   saveEvents: (value) => writeJson("robostew:events", value.slice(-80)),
 };

@@ -1,0 +1,22 @@
+{
+  "apiVersion": "v1",
+  "kind": "NodeList",
+  "items": [
+    {
+      "metadata": { "name": "fixture-gpu-node" },
+      "status": {
+        "capacity": { "cpu": "64", "nvidia.com/gpu": "8" },
+        "allocatable": { "cpu": "62", "nvidia.com/gpu": "8" },
+        "conditions": [{ "type": "Ready", "status": "True" }]
+      }
+    },
+    {
+      "metadata": { "name": "fixture-cpu-node" },
+      "status": {
+        "capacity": { "cpu": "16" },
+        "allocatable": { "cpu": "15" },
+        "conditions": [{ "type": "Ready", "status": "True" }]
+      }
+    }
+  ]
+}
